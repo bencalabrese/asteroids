@@ -23,7 +23,7 @@ Game.randomPosition = function(){
 };
 
 Game.prototype.draw = function(context){
-  context.clearRect();
+  context.clearRect(0, 0, this.DIM_X, this.DIM_Y);
 
   this.asteroids.forEach(function(el){
     el.draw(context);
@@ -35,3 +35,5 @@ Game.prototype.moveObjects = function() {
     el.move();
   });
 };
+
+module.exports = Game;

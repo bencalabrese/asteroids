@@ -12,3 +12,5 @@ GameView.prototype.start = function() {
     self.game.draw(self.context);
   }, 20);
 };
+
+module.exports = GameView;
