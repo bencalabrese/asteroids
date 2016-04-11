@@ -63,17 +63,17 @@
 	var Asteroid = __webpack_require__(2);
 
 	function Game () {
-	  this.asteroids = Game.addAsteroids();
+	  this.asteroids = this.addAsteroids();
 	}
 
-	Game.DIM_X = 400;
-	Game.DIM_Y = 500;
+	Game.DIM_X = 1000;
+	Game.DIM_Y = 800;
 	Game.NUM_ASTEROIDS = 5;
 
-	Game.addAsteroids = function () {
+	Game.prototype.addAsteroids = function () {
 	  var asteroids = [];
 	  for (var i = 0; i < Game.NUM_ASTEROIDS; i++){
-	    asteroids.push(new Asteroid({pos: Game.randomPosition()}));
+	    asteroids.push(new Asteroid({pos: Game.randomPosition(), game: this}));
 	  }
 	  return asteroids;
 	};
@@ -85,7 +85,8 @@
 	};
 
 	Game.prototype.draw = function(context){
-	  context.clearRect(0, 0, this.DIM_X, this.DIM_Y);
+
+	  context.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
 
 	  this.asteroids.forEach(function(el){
 	    el.draw(context);
@@ -96,6 +97,12 @@
 	  this.asteroids.forEach(function(el){
 	    el.move();
 	  });
+	};
+
+	Game.prototype.wrap = function(pos){
+	  var x = (pos[0] + Game.DIM_X) % Game.DIM_X;
+	  var y = (pos[1] + Game.DIM_Y) % Game.DIM_Y;
+	  return [x, y];
 	};
 
 	module.exports = Game;
@@ -109,16 +116,19 @@
 	var Util = __webpack_require__(4);
 
 	var Asteroid = function(options){
-	  this.pos = options.pos;
-	  this.color = Asteroid.COLOR;
-	  this.radius = Asteroid.RADIUS;
-	  this.vel = Util.randomVec(5);
+	  MovingObject.call(this, {
+	    pos: options.pos,
+	    game: options.game,
+	    color: Asteroid.COLOR,
+	    radius: Asteroid.RADIUS,
+	    vel: Util.randomVec(5)
+	  });
 	};
 
 	Util.inherits(Asteroid, MovingObject);
 
-	Asteroid.COLOR = "000000";
-	Asteroid.RADIUS = 5;
+	Asteroid.COLOR = "magenta";
+	Asteroid.RADIUS = 25;
 
 	module.exports = Asteroid;
 
@@ -129,6 +139,7 @@
 
 	var MovingObject = function(options){
 	  this.pos = options.pos;
+	  this.game = options.game;
 	  this.vel = options.vel;
 	  this.radius = options.radius;
 	  this.color = options.color;
@@ -152,6 +163,8 @@
 	MovingObject.prototype.move = function(){
 	  this.pos[0] += this.vel[0];
 	  this.pos[1] += this.vel[1];
+
+	  this.pos = this.game.wrap(this.pos);
 	};
 
 	module.exports = MovingObject;
