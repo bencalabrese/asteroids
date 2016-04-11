@@ -1,5 +1,4 @@
 function sum() {
-  console.log(this);
   var args = Array.prototype.slice.call(arguments);
   return args.reduce(function(accum, el) {
     return accum + el;
@@ -21,3 +20,21 @@ var Dog = {
 };
 
 console.log(sum.myBind(Dog, 1, 2, 3)());
+
+function curriedSum(numArgs) {
+  var numbers = [];
+  var _curriedSum = function(number) {
+    numbers.push(number);
+    if (numbers.length === numArgs) {
+      return sum.apply(null, numbers);
+    } else {
+      return _curriedSum;
+    }
+  };
+
+  return _curriedSum;
+}
+
+var sumFour = curriedSum(4);
+
+console.log(sumFour(5)(30)(20)(1));
