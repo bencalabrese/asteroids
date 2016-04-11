@@ -38,3 +38,21 @@ function curriedSum(numArgs) {
 var sumFour = curriedSum(4);
 
 console.log(sumFour(5)(30)(20)(1));
+
+
+Function.prototype.curry = function(numArgs){
+  var args = [];
+  var fn = this;
+  var _curriedFunction = function(arg){
+    args.push(arg);
+    if (args.length === numArgs){
+      return fn.apply(fn, args);
+    } else {
+      return _curriedFunction;
+    }
+  };
+  return _curriedFunction;
+};
+
+var sumThree = sum.curry(3);
+console.log(sumThree(5)(6)(7));
