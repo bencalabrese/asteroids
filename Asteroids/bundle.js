@@ -105,6 +105,26 @@
 	  return [x, y];
 	};
 
+	Game.prototype.checkCollisions = function () {
+	  for (var i = 0; i < this.asteroids.length; i++) {
+	    for (var j = i + 1; j < this.asteroids.length; j++) {
+	      if (this.asteroids[i].isCollidedWith(this.asteroids[j])) {
+	        alert("Collision!");
+	      }
+	    }
+	  }
+	};
+
+	Game.prototype.step = function(context){
+	  this.moveObjects();
+	  this.checkCollisions();
+	  this.draw(context);
+	};
+
+	Game.prototype.remove = function(asteroid){
+
+	};
+
 	module.exports = Game;
 
 
@@ -135,7 +155,9 @@
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
+
+	var Util = __webpack_require__(4);
 
 	var MovingObject = function(options){
 	  this.pos = options.pos;
@@ -167,6 +189,12 @@
 	  this.pos = this.game.wrap(this.pos);
 	};
 
+	MovingObject.prototype.isCollidedWith = function(otherObject){
+	  var distance = Util.distance(this.pos, otherObject.pos);
+
+	  return distance < (this.radius + otherObject.radius);
+	};
+
 	module.exports = MovingObject;
 
 
@@ -192,6 +220,13 @@
 	  return [x, y];
 	};
 
+	Util.distance = function(pos1, pos2) {
+	  var xDistance = Math.abs(pos2[0] - pos1[0]);
+	  var yDistance = Math.abs(pos2[1] - pos1[1]);
+
+	  return Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+	};
+
 	module.exports = Util;
 
 
@@ -209,8 +244,7 @@
 	GameView.prototype.start = function() {
 	  var self = this;
 	  setInterval(function() {
-	    self.game.moveObjects();
-	    self.game.draw(self.context);
+	    self.game.step(self.context);
 	  }, 20);
 	};
 

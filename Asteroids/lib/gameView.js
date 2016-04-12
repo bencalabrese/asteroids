@@ -8,8 +8,7 @@ function GameView(game, context) {
 GameView.prototype.start = function() {
   var self = this;
   setInterval(function() {
-    self.game.moveObjects();
-    self.game.draw(self.context);
+    self.game.step(self.context);
   }, 20);
 };
 

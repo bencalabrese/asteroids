@@ -16,4 +16,11 @@ Util.randomVec = function(length){
   return [x, y];
 };
 
+Util.distance = function(pos1, pos2) {
+  var xDistance = Math.abs(pos2[0] - pos1[0]);
+  var yDistance = Math.abs(pos2[1] - pos1[1]);
+
+  return Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
+};
+
 module.exports = Util;
