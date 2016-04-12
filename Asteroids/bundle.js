@@ -61,9 +61,11 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var Asteroid = __webpack_require__(2);
+	var Ship = __webpack_require__(6);
 
 	function Game () {
 	  this.asteroids = this.addAsteroids();
+	  this.ship = new Ship({pos: Game.prototype.randomPosition(), game: this});
 	}
 
 	Game.DIM_X = 1000;
@@ -73,12 +75,12 @@
 	Game.prototype.addAsteroids = function () {
 	  var asteroids = [];
 	  for (var i = 0; i < Game.NUM_ASTEROIDS; i++){
-	    asteroids.push(new Asteroid({pos: Game.randomPosition(), game: this}));
+	    asteroids.push(new Asteroid({pos: Game.prototype.randomPosition(), game: this}));
 	  }
 	  return asteroids;
 	};
 
-	Game.randomPosition = function(){
+	Game.prototype.randomPosition = function(){
 	  var x = Math.floor(Math.random() * Game.DIM_X);
 	  var y = Math.floor(Math.random() * Game.DIM_Y);
 	  return [x, y];
@@ -88,13 +90,13 @@
 
 	  context.clearRect(0, 0, Game.DIM_X, Game.DIM_Y);
 
-	  this.asteroids.forEach(function(el){
+	  this.allObjects().forEach(function(el){
 	    el.draw(context);
 	  });
 	};
 
 	Game.prototype.moveObjects = function() {
-	  this.asteroids.forEach(function(el){
+	  this.allObjects().forEach(function(el){
 	    el.move();
 	  });
 	};
@@ -106,10 +108,11 @@
 	};
 
 	Game.prototype.checkCollisions = function () {
-	  for (var i = 0; i < this.asteroids.length; i++) {
-	    for (var j = i + 1; j < this.asteroids.length; j++) {
-	      if (this.asteroids[i].isCollidedWith(this.asteroids[j])) {
-	        this.asteroids[i].collideWith(this.asteroids[j]);
+	  for (var i = 0; i < this.allObjects().length; i++) {
+	    for (var j = i + 1; j < this.allObjects().length; j++) {
+
+	      if (this.allObjects()[i].isCollidedWith(this.allObjects()[j])) {
+	        this.allObjects()[i].collideWith(this.allObjects()[j]);
 	      }
 	    }
 	  }
@@ -125,6 +128,9 @@
 	  this.asteroids.splice(this.asteroids.indexOf(asteroid), 1);
 	};
 
+	Game.prototype.allObjects = function () {
+	  return this.asteroids.concat([this.ship]);
+	};
 	module.exports = Game;
 
 
@@ -134,6 +140,7 @@
 
 	var MovingObject = __webpack_require__(3);
 	var Util = __webpack_require__(4);
+	var Ship = __webpack_require__(6);
 
 	var Asteroid = function(options){
 	  MovingObject.call(this, {
@@ -149,6 +156,19 @@
 
 	Asteroid.COLOR = "magenta";
 	Asteroid.RADIUS = 25;
+
+	Asteroid.prototype.collideWith = function(otherObject){
+	  var self = this;
+
+	  setTimeout(function() {
+	    if (otherObject instanceof Ship){
+	      otherObject.relocate();
+	    } else {
+	      self.game.remove(otherObject);
+	    }
+	    self.game.remove(self);
+	  }, 0);
+	};
 
 	module.exports = Asteroid;
 
@@ -196,12 +216,6 @@
 	};
 
 	MovingObject.prototype.collideWith = function(otherObject){
-	  var self = this;
-
-	  setTimeout(function() {
-	    self.game.remove(otherObject);
-	    self.game.remove(self);
-	  }, 0);
 	};
 
 	module.exports = MovingObject;
@@ -258,6 +272,36 @@
 	};
 
 	module.exports = GameView;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var MovingObject = __webpack_require__(3);
+	var Util = __webpack_require__(4);
+
+	var Ship = function(options){
+	  MovingObject.call(this, {
+	    pos: options.pos,
+	    game: options.game,
+	    color: Ship.COLOR,
+	    radius: Ship.RADIUS,
+	    vel: [0, 0]
+	  });
+	};
+
+	Util.inherits(Ship, MovingObject);
+
+	Ship.COLOR = "green";
+	Ship.RADIUS = 25;
+
+	Ship.prototype.relocate = function(){
+	  this.pos = this.game.randomPosition();
+	  this.vel = [0,0];
+	};
+
+	module.exports = Ship;
 
 
 /***/ }
