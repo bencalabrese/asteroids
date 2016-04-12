@@ -68,7 +68,7 @@
 
 	Game.DIM_X = 1000;
 	Game.DIM_Y = 800;
-	Game.NUM_ASTEROIDS = 5;
+	Game.NUM_ASTEROIDS = 10;
 
 	Game.prototype.addAsteroids = function () {
 	  var asteroids = [];
@@ -109,7 +109,7 @@
 	  for (var i = 0; i < this.asteroids.length; i++) {
 	    for (var j = i + 1; j < this.asteroids.length; j++) {
 	      if (this.asteroids[i].isCollidedWith(this.asteroids[j])) {
-	        alert("Collision!");
+	        this.asteroids[i].collideWith(this.asteroids[j]);
 	      }
 	    }
 	  }
@@ -122,7 +122,7 @@
 	};
 
 	Game.prototype.remove = function(asteroid){
-
+	  this.asteroids.splice(this.asteroids.indexOf(asteroid), 1);
 	};
 
 	module.exports = Game;
@@ -193,6 +193,15 @@
 	  var distance = Util.distance(this.pos, otherObject.pos);
 
 	  return distance < (this.radius + otherObject.radius);
+	};
+
+	MovingObject.prototype.collideWith = function(otherObject){
+	  var self = this;
+
+	  setTimeout(function() {
+	    self.game.remove(otherObject);
+	    self.game.remove(self);
+	  }, 0);
 	};
 
 	module.exports = MovingObject;
